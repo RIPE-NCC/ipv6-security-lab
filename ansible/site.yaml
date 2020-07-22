@@ -194,13 +194,10 @@
 
     - name: deploy static website
       copy:
-        remote_src: yes
-        src: /vagrant/labfrontend/_site/
+        src: ../../labfrontend/_site/
         dest: /var/www/html/
         owner: www-data
         group: www-data
-        mode: 0644
-        directory_mode: 0755
 
     - name: install fancy 404 page
       lineinfile:
