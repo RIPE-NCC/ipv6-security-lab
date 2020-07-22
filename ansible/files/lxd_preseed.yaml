@@ -1,0 +1,49 @@
+networks:
+- config:
+    ipv4.address: auto
+    ipv6.address: auto
+  description: "Default network"
+  name: lxdbr0
+- config:
+    ipv4.address: none
+    ipv6.address: none
+  name: lxdR1R2
+- config:
+    ipv4.address: none
+    ipv6.address: none
+  name: lxdR1R3
+- config:
+    ipv4.address: none
+    ipv6.address: none
+  name: lxdIXP
+- config:
+    ipv4.address: none
+    ipv6.address: none
+  name: lxdR2R3
+- config:
+    ipv4.address: none
+    ipv6.address: none
+  name: lxdR2C1
+- config:
+    ipv4.address: none
+    ipv6.address: none
+  name: lxdR3C2
+storage_pools:
+- config:
+  description: ""
+  name: default
+  driver: dir
+profiles:
+- config: {}
+  description: ""
+  devices:
+    eth0:
+      name: eth0
+      nictype: bridged
+      parent: lxdbr0
+      type: nic
+    root:
+      path: /
+      pool: default
+      type: disk
+  name: default

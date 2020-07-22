@@ -1,0 +1,268 @@
+---
+
+- name: Deploy LXD
+  hosts: default
+  become: false
+  tasks:
+    - name: Initialize LXD
+      command:
+        cmd: lxd init --preseed
+        stdin: "{{ lookup('file', 'lxd_preseed.yaml') }}"
+        creates: /var/lib/lxd/networks/lxdbr0
+
+    - name: Create first Alpine container
+      lxd_container:
+        name: R1
+        state: started
+        source:
+          type: image
+          mode: pull
+          server: https://images.linuxcontainers.org
+          protocol: lxd # if you get a 404, try setting protocol: simplestreams
+          alias: alpine/3.12/amd64
+        profiles: ["default"]
+        wait_for_ipv4_addresses: true
+
+    - name: Check Python3 in the container
+      delegate_to: R1
+      raw: python3 /dev/null
+      register: python3_check
+      failed_when: false
+      changed_when: false
+
+    - name: "Install Python 3 into Alpine container"
+      delegate_to: R1
+      raw: apk add python3
+      when: python3_check.rc != 0
+
+    - name: Upgrade everything in the container
+      delegate_to: R1
+      apk:
+        update_cache: yes
+        upgrade: yes
+
+    - name: Install FRR into container
+      delegate_to: R1
+      apk:
+        name: frr
+
+    - name: "Clone container"
+      command:
+        cmd: "lxc cp R1 {{ item }}"
+        creates: "/var/lib/lxd/containers/{{ item }}"
+      with_items:
+        - R2
+        - R3
+        - C1
+        - C2
+        - AS66
+        - AS99
+
+    - name: "Attach networks to the containers"
+      command:
+        cmd: "lxc network attach {{ item.network }} {{ item.container }} {{ item.ifname }} {{ item.ifname }}"
+      register: net_attach
+      failed_when: net_attach.rc not in [0, 1]
+      changed_when: net_attach.rc == 0
+      with_items:
+         - network: lxdIXP
+           container: AS66
+           ifname: ixp
+         - network: lxdIXP
+           container: AS99
+           ifname: ixp
+         - network: lxdIXP
+           container: R1
+           ifname: ixp
+         - network: lxdR1R2
+           container: R1
+           ifname: to_R2
+         - network: lxdR1R3
+           container: R1
+           ifname: to_R3
+         - network: lxdR1R2
+           container: R2
+           ifname: to_R1
+         - network: lxdR2R3
+           container: R2
+           ifname: to_R3
+         - network: lxdR2C1
+           container: R2
+           ifname: to_C1
+         - network: lxdR1R3
+           container: R3
+           ifname: to_R1
+         - network: lxdR2R3
+           container: R3
+           ifname: to_R2
+         - network: lxdR3C2
+           container: R3
+           ifname: to_C2
+         - network: lxdR2C1
+           container: C1
+           ifname: to_R2
+         - network: lxdR3C2
+           container: C2
+           ifname: to_R3
+
+    - name: Ensure containers are started
+      lxd_container:
+        name: "{{ item }}"
+        state: started
+      with_items:
+        - R2
+        - R3
+        - C1
+        - C2
+        - AS66
+        - AS99
+
+- name: Host provision
+  hosts: default
+  become: true
+  tasks:
+    #- name: Upgrade everything
+    #  apt:
+    #    upgrade: dist
+
+    - name: Install necessary packages
+      apt:
+        package:
+          - nginx
+          - tmux
+          - libwebsockets8
+
+    - name: Setup WebSockets connection upgrade
+      copy:
+        src: connection_upgrade.conf
+        dest: "/etc/nginx/conf.d/"
+      notify: reload nginx
+
+    - name: Setup ttyd proxy snippet
+      copy:
+        src: ttydconsole.conf
+        dest: "/etc/nginx/snippets/"
+      notify: reload nginx
+
+    - name: Enable ttyd proxy snippet
+      lineinfile:
+        path: "/etc/nginx/sites-available/default"
+        line: "include /etc/nginx/snippets/ttydconsole.conf;"
+        insertbefore: "^\\s*location / {.*$"
+      notify: reload nginx
+
+    - name: Start nginx
+      service:
+        name: nginx
+        state: started
+        enabled: on
+
+    - name: Install ttyd
+      #get_url:
+        #url: https://github.com/tsl0922/ttyd/releases/download/1.6.1/ttyd_linux.x86_64
+      copy:
+        src: ttyd
+        dest: /opt/ttyd
+        mode: 0755
+
+    - name: Deploy tmux config file
+      copy:
+        src: ttyd-tmux.conf
+        dest: "/opt/"
+
+    - name: Deploy ttyd-vtysh unit files
+      copy:
+        src: "{{ item }}"
+        dest: "/etc/systemd/system/"
+      notify: systemctl daemon-reload
+      with_items:
+        - ttyd-vtysh@.service
+        - ttyd-vtysh.target
+
+    - name: Deploy ttyd-vtysh generator
+      copy:
+        src: ttyd-vtysh.generator
+        dest: "/etc/systemd/system-generators/"
+        mode: 0755
+      notify: systemctl daemon-reload
+
+    - name: enable ttyd-vtysh service
+      service:
+        name: ttyd-vtysh.target
+        state: started
+        enabled: on
+
+    - name: deploy static website
+      copy:
+        remote_src: yes
+        src: /vagrant/labfrontend/_site/
+        dest: /var/www/html/
+        owner: www-data
+        group: www-data
+        mode: 0644
+        directory_mode: 0755
+
+    - name: install fancy 404 page
+      lineinfile:
+        path: "/etc/nginx/sites-available/default"
+        line: "error_page 404 /404.html;"
+        insertafter: "^\\s*root /var/www/html;$"
+      notify: reload nginx
+
+  handlers:
+    - name: reload nginx
+      service:
+        name: nginx
+        state: reloaded
+
+    - name: systemctl daemon-reload
+      systemd:
+        daemon_reload: yes
+
+- name: Deploy containers
+  hosts: containers
+  tasks:
+    - name: Template common configs
+      template:
+        src: "{{ item }}.j2"
+        dest: "/etc/frr/{{ item }}"
+        owner: frr
+        group: frr
+        mode: 0644
+      notify: restart frr
+      with_items:
+        - vtysh.conf
+
+    - name: Deploy configs
+      copy:
+        src: "{{ inventory_hostname }}/{{ item }}"
+        dest: "/etc/frr/{{ item }}"
+        owner: frr
+        group: frr
+        mode: 0644
+      notify: restart frr
+      when: "[ playbook_dir, \"files\", inventory_hostname, item]|join('/') is file"
+      with_items:
+        - zebra.conf
+
+    - name: Enable bgpd
+      lineinfile:
+        path: "/etc/frr/daemons"
+        line: "bgpd=yes"
+        regexp: "^bgpd="
+      notify: restart frr
+
+    - name: Enable and start frr
+      service:
+        name: frr
+        state: started
+        enabled: yes
+
+  handlers:
+    - name: restart frr
+      service:
+        name: frr
+        state: restarted
+
+
+...
