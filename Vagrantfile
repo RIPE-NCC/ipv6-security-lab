@@ -70,7 +70,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "ansible_local" do |ansible|
     ansible.playbook = "ansible/site.yaml"
     ansible.inventory_path = "ansible/inventory"
-    ansible.verbose = true
+    ansible.verbose = false
     ansible.limit = "all"
   end
 end
