@@ -69,7 +69,7 @@ Vagrant.configure("2") do |config|
   # SHELL
   config.vm.provision "ansible_local" do |ansible|
     ansible.playbook = "ansible/site.yaml"
-    ansible.inventory_path = "ansible/inventory"
+    ansible.inventory_path = "ansible/inventory.ini"
     ansible.verbose = false
     ansible.limit = "all"
   end

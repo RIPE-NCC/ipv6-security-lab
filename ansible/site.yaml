@@ -134,13 +134,13 @@
 
     - name: Setup WebSockets connection upgrade
       copy:
-        src: connection_upgrade.conf
+        src: nginx/connection_upgrade.conf
         dest: "/etc/nginx/conf.d/"
       notify: reload nginx
 
     - name: Setup ttyd proxy snippet
       copy:
-        src: ttydconsole.conf
+        src: nginx/ttydconsole.conf
         dest: "/etc/nginx/snippets/"
       notify: reload nginx
 
@@ -158,6 +158,8 @@
         enabled: on
 
     - name: Install ttyd
+      # We use a locally complied binary until this is fixed:
+      # https://github.com/tsl0922/ttyd/issues/414
       #get_url:
         #url: https://github.com/tsl0922/ttyd/releases/download/1.6.1/ttyd_linux.x86_64
       copy:
@@ -172,7 +174,7 @@
 
     - name: Deploy ttyd-vtysh unit files
       copy:
-        src: "{{ item }}"
+        src: "systemd/{{ item }}"
         dest: "/etc/systemd/system/"
       notify: systemctl daemon-reload
       with_items:
@@ -181,12 +183,12 @@
 
     - name: Deploy ttyd-vtysh generator
       copy:
-        src: ttyd-vtysh.generator
+        src: systemd/ttyd-vtysh.generator
         dest: "/etc/systemd/system-generators/"
         mode: 0755
       notify: systemctl daemon-reload
 
-    - name: enable ttyd-vtysh service
+    - name: enable ttyd-vtysh target
       service:
         name: ttyd-vtysh.target
         state: started
