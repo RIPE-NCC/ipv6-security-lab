@@ -1,0 +1,14 @@
+[Unit]
+Description=ttyd admin instance
+
+[Service]
+User=vagrant
+Group=www-data
+RuntimeDirectory=ttyd-admin
+UMask=0002
+ExecStart=/opt/ttyd -i /run/ttyd-admin/admin.sock -t fontSize=20 -t disableLeaveAlert=true tmux new -A -s admin
+Type=simple
+Restart=always
+
+[Install]
+WantedBy=default.target

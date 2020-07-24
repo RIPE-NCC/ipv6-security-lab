@@ -6,7 +6,7 @@ User=vagrant
 Group=www-data
 RuntimeDirectory=ttyd-vtysh
 UMask=0002
-ExecStart=/opt/ttyd -i /run/ttyd-vtysh/%i.sock -t fontSize=20 -t disableLeaveAlert=true tmux -f /opt/ttyd-tmux.conf new -A -s %i lxc exec %i vtysh
+ExecStart=/opt/ttyd -i /run/ttyd-vtysh/%i.sock -t fontSize=20 -t disableLeaveAlert=true tmux -f /opt/ttyd-tmux.conf -L vtysh new -A -s %i lxc exec %i vtysh
 Type=simple
 Restart=always
 

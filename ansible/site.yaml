@@ -46,6 +46,18 @@
       apk:
         name: frr
 
+    - name: Ensure IP forwarding is enabled
+      delegate_to: R1
+      sysctl:
+        sysctl_file: /etc/sysctl.d/forwarding.conf
+        name: "{{ item }}"
+        value: "1"
+        sysctl_set: yes
+      with_items:
+          - net.ipv4.conf.all.forwarding
+          - net.ipv6.conf.all.forwarding
+          - net.ipv6.conf.default.forwarding
+
     # Commented out because this will make second run of this playbook
     # to fail unless container R1 is deleted beforehand
 
@@ -150,6 +162,13 @@
         dest: "/etc/nginx/conf.d/"
       notify: reload nginx
 
+    - name: Disable absolute redirects
+      lineinfile:
+        line: "absolute_redirect off;"
+        dest: "/etc/nginx/conf.d/no_absolute_redirects.conf"
+        create: yes
+      notify: reload nginx
+
     - name: Setup ttyd proxy snippet
       copy:
         src: nginx/ttydconsole.conf
@@ -206,6 +225,7 @@
       notify: systemctl daemon-reload
       with_items:
         - ttyd-vtysh@.service
+        - ttyd-admin.service
         - ttyd-vtysh.target
 
     - name: Deploy ttyd-vtysh generator
@@ -218,6 +238,12 @@
     - name: Enable and start ttyd-vtysh target
       service:
         name: ttyd-vtysh.target
+        state: started
+        enabled: on
+
+    - name: Enable and start ttyd-admin
+      service:
+        name: ttyd-admin.service
         state: started
         enabled: on
 
@@ -266,8 +292,8 @@
       notify: restart frr
       with_items:
         - bgpd
-        #- ospfd
-        #- ospf6d
+        - ospfd
+        - ospf6d
         #- isisd
 
     - name: Enable and start frr
