@@ -58,6 +58,13 @@
           - net.ipv6.conf.all.forwarding
           - net.ipv6.conf.default.forwarding
 
+    - name: Enable and start sysctl in the container
+      delegate_to: R1
+      service:
+        name: sysctl
+        state: started
+        enabled: yes
+
     # Commented out because this will make second run of this playbook
     # to fail unless container R1 is deleted beforehand
 
