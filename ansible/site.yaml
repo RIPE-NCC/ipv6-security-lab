@@ -167,6 +167,7 @@
       copy:
         src: nginx/connection_upgrade.conf
         dest: "/etc/nginx/conf.d/"
+        mode: 0644
       notify: reload nginx
 
     - name: Disable absolute redirects
@@ -174,12 +175,14 @@
         line: "absolute_redirect off;"
         dest: "/etc/nginx/conf.d/no_absolute_redirects.conf"
         create: yes
+        mode: 0644
       notify: reload nginx
 
     - name: Setup ttyd proxy snippet
       copy:
         src: nginx/ttydconsole.conf
         dest: "/etc/nginx/snippets/"
+        mode: 0644
       notify: reload nginx
 
     - name: Enable ttyd proxy snippet
@@ -195,6 +198,7 @@
         dest: /var/www/html/
         owner: www-data
         group: www-data
+        mode: 0644
 
     - name: Install fancy 404 page
       lineinfile:
@@ -224,11 +228,13 @@
       copy:
         src: ttyd-tmux.conf
         dest: "/opt/"
+        mode: 0644
 
     - name: Deploy ttyd-vtysh unit files
       copy:
         src: "systemd/{{ item }}"
         dest: "/etc/systemd/system/"
+        mode: 0644
       notify: systemctl daemon-reload
       with_items:
         - ttyd-vtysh@.service
