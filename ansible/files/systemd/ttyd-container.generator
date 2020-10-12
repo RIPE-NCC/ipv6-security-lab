@@ -1,0 +1,12 @@
+#!/bin/sh
+set -eu
+
+GENDIR="$1"
+WANTDIR="$1/ttyd-container.target.wants"
+SERVICEFILE="/etc/systemd/system/ttyd-container@.service"
+
+mkdir -p "$WANTDIR"
+
+for INSTANCE in $(cd /var/lib/lxd/containers/; ls 2> /dev/null); do
+	ln -s "$SERVICEFILE" "$WANTDIR/ttyd-container@$INSTANCE.service"
+done

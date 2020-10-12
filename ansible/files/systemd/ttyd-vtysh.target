@@ -1,5 +1,0 @@
-[Unit]
-Description=ttyd-vtysh target
-
-[Install]
-WantedBy=default.target

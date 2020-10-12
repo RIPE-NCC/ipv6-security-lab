@@ -10,141 +10,126 @@
         stdin: "{{ lookup('file', 'lxd_preseed.yaml') }}"
         creates: /var/lib/lxd/networks/lxdbr0
 
-    - name: Create first Alpine container
+    - name: Create first Centos7 container
       lxd_container:
-        name: R1
+        name: hostA
         state: started
         source:
           type: image
           mode: pull
           server: https://images.linuxcontainers.org
           protocol: lxd # if you get a 404, try setting protocol: simplestreams
-          alias: alpine/3.12/amd64
+          alias: centos/7/amd64
         profiles: ["default"]
         wait_for_ipv4_addresses: true
 
-    - name: Check Python3 in the container
-      delegate_to: R1
-      raw: python3 /dev/null
-      register: python3_check
-      failed_when: false
-      changed_when: false
+    - name: Install epel-release
+      delegate_to: hostA
+      package:
+        name: epel-release
 
-    - name: Install Python 3 into Alpine container
-      delegate_to: R1
-      raw: apk add python3
-      when: python3_check.rc != 0
+    - name: Install necessary packages
+      delegate_to: hostA
+      package:
+        update_cache: true
+        name:
+          - python-pip
+          - python3
+          - tcpdump
+          - wget
+          - libpcap-devel
+          - openssl-devel
+          - gcc
+          - libssl*
+          - libnetfilter_queue-devel
+          - python-setuptools
+          - git
+          - make
+          - man
 
-    - name: Upgrade everything in the container
-      delegate_to: R1
-      apk:
-        update_cache: yes
-        upgrade: yes
+    - name: Upgrade pip
+      delegate_to: hostA
+      pip:
+        executable: pip
+        state: latest
+        name: pip
 
-    - name: Install FRR into container
-      delegate_to: R1
-      apk:
-        name: frr
+    - name: Install python packages
+      delegate_to: hostA
+      pip:
+        executable: pip
+        state: latest
+        name:
+          - scapy
+          - cryptography
+          - netaddr
+          - ipython==5.10.0
 
-    - name: Ensure IP forwarding is enabled
-      delegate_to: R1
-      sysctl:
-        sysctl_file: /etc/sysctl.d/forwarding.conf
-        name: "{{ item }}"
-        value: "1"
-        sysctl_set: yes
-      with_items:
-          - net.ipv4.conf.all.forwarding
-          - net.ipv6.conf.all.forwarding
-          - net.ipv6.conf.default.forwarding
+    - name: Clone IPv6 toolkit repository
+      delegate_to: hostA
+      git:
+        repo: https://github.com/fgont/ipv6toolkit
+        dest: /usr/src/ipv6toolkit
+      register: clone_toolkit
 
-    - name: Enable and start sysctl in the container
-      delegate_to: R1
-      service:
-        name: sysctl
-        state: started
-        enabled: yes
+    - name: Compile the IPv6 toolkit
+      delegate_to: hostA
+      command:
+        cmd: make all
+        chdir: /usr/src/ipv6toolkit
+      when: clone_toolkit.changed
+      register: compile_toolkit
 
-    # Commented out because this will make second run of this playbook
-    # to fail unless container R1 is deleted beforehand
+    - name: Install the IPv6 toolkit
+      delegate_to: hostA
+      command:
+        cmd: make install
+        chdir: /usr/src/ipv6toolkit
+      when: compile_toolkit.changed
 
-    #- name: "Detach default network from containers"
-    #  command:
-    #    cmd: "lxc network detach-profile lxdbr0 default"
-    #  register: net_detach
-    #  failed_when: net_detach.rc not in [0, 1]
-    #  changed_when: net_detach.rc == 0
+    - name: Clone the Chiron repository
+      delegate_to: hostA
+      git:
+        repo: https://github.com/aatlasis/chiron
+        dest: /root/Chiron
+
+    - name: Clone the THC-IPv6 repository
+      delegate_to: hostA
+      git:
+        repo: https://github.com/vanhauser-thc/thc-ipv6
+        dest: /usr/src/thc-ipv6
+      register: clone_thc
+
+    - name: Compile the THC-IPv6 toolkit
+      delegate_to: hostA
+      command:
+        cmd: make
+        chdir: /usr/src/thc-ipv6
+      when: clone_thc.changed
+      register: compile_thc
+
+    - name: Install the THC-IPv6 toolkit
+      delegate_to: hostA
+      command:
+        cmd: make install
+        chdir: /usr/src/thc-ipv6
+      when: compile_thc.changed
 
     - name: Clone container
       command:
-        cmd: "lxc cp R1 {{ item }}"
+        cmd: "lxc cp hostA {{ item }}"
         creates: "/var/lib/lxd/containers/{{ item }}"
       with_items:
-        - R2
-        - R3
-        - C1
-        - C2
-        - AS66
-        - AS99
-
-    - name: Attach networks to the containers
-      command:
-        cmd: "lxc network attach {{ item.network }} {{ item.container }} {{ item.ifname }} {{ item.ifname }}"
-      register: net_attach
-      failed_when: net_attach.rc not in [0, 1]
-      changed_when: net_attach.rc == 0
-      with_items:
-         - network: lxdIXP
-           container: AS66
-           ifname: ixp
-         - network: lxdIXP
-           container: AS99
-           ifname: ixp
-         - network: lxdIXP
-           container: R1
-           ifname: ixp
-         - network: lxdR1R2
-           container: R1
-           ifname: to_R2
-         - network: lxdR1R3
-           container: R1
-           ifname: to_R3
-         - network: lxdR1R2
-           container: R2
-           ifname: to_R1
-         - network: lxdR2R3
-           container: R2
-           ifname: to_R3
-         - network: lxdR2C1
-           container: R2
-           ifname: to_C1
-         - network: lxdR1R3
-           container: R3
-           ifname: to_R1
-         - network: lxdR2R3
-           container: R3
-           ifname: to_R2
-         - network: lxdR3C2
-           container: R3
-           ifname: to_C2
-         - network: lxdR2C1
-           container: C1
-           ifname: to_R2
-         - network: lxdR3C2
-           container: C2
-           ifname: to_R3
+        - hostB
+        - hostC
 
     - name: Ensure containers are started
       lxd_container:
         name: "{{ item }}"
         state: started
       with_items:
-        - R2
-        - R3
-        - C1
-        - C2
-        - AS66
-        - AS99
+        - hostB
+        - hostC
 
 - name: Host provision
   hosts: default
@@ -230,27 +215,27 @@
         dest: "/opt/"
         mode: 0644
 
-    - name: Deploy ttyd-vtysh unit files
+    - name: Deploy ttyd-container unit files
       copy:
         src: "systemd/{{ item }}"
         dest: "/etc/systemd/system/"
         mode: 0644
       notify: systemctl daemon-reload
       with_items:
-        - ttyd-vtysh@.service
+        - ttyd-container@.service
         - ttyd-admin.service
-        - ttyd-vtysh.target
+        - ttyd-container.target
 
-    - name: Deploy ttyd-vtysh generator
+    - name: Deploy ttyd-container generator
       copy:
-        src: systemd/ttyd-vtysh.generator
+        src: systemd/ttyd-container.generator
         dest: "/etc/systemd/system-generators/"
         mode: 0755
       notify: systemctl daemon-reload
 
-    - name: Enable and start ttyd-vtysh target
+    - name: Enable and start ttyd-container target
       service:
-        name: ttyd-vtysh.target
+        name: ttyd-container.target
         state: started
         enabled: on
 
@@ -269,57 +254,6 @@
     - name: systemctl daemon-reload
       systemd:
         daemon_reload: yes
-
-- name: Configure containers
-  hosts: containers
-  tasks:
-    - name: Template common configs
-      template:
-        src: "{{ item }}.j2"
-        dest: "/etc/frr/{{ item }}"
-        owner: frr
-        group: frr
-        mode: 0644
-      notify: restart frr
-      with_items:
-        - vtysh.conf
-
-    - name: Deploy configs
-      copy:
-        src: "{{ inventory_hostname }}/{{ item }}"
-        dest: "/etc/frr/{{ item }}"
-        owner: frr
-        group: frr
-        mode: 0644
-      notify: restart frr
-      when: "[ playbook_dir, \"files\", inventory_hostname, item]|join('/') is file"
-      with_items:
-        - zebra.conf
-        - bgpd.conf
-
-    - name: Enable FRR daemons
-      lineinfile:
-        path: "/etc/frr/daemons"
-        line: "{{ item }}=yes"
-        regexp: "^{{ item }}="
-      notify: restart frr
-      with_items:
-        - bgpd
-        - ospfd
-        - ospf6d
-        #- isisd
-
-    - name: Enable and start frr
-      service:
-        name: frr
-        state: started
-        enabled: yes
-
-  handlers:
-    - name: restart frr
-      service:
-        name: frr
-        state: restarted
 
 
 ...

@@ -1,0 +1,14 @@
+[Unit]
+Description=ttyd-container instance %I
+
+[Service]
+User=vagrant
+Group=www-data
+RuntimeDirectory=ttyd-container
+UMask=0002
+ExecStart=/opt/ttyd -i /run/ttyd-container/%i.sock -t fontSize=14 -t disableLeaveAlert=true tmux -f /opt/ttyd-tmux.conf -L container set -g default-command "lxc exec %i bash" \; new -A -s %i
+Type=simple
+Restart=always
+
+[Install]
+WantedBy=default.target

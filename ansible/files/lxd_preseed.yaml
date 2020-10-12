@@ -1,33 +1,10 @@
 networks:
 - config:
     ipv4.address: auto
-    ipv6.address: auto
+    ipv6.address: 2001:db8:f:1::1/64
+    ipv6.dhcp: false
   description: "Default network"
   name: lxdbr0
-- config:
-    ipv4.address: none
-    ipv6.address: none
-  name: lxdR1R2
-- config:
-    ipv4.address: none
-    ipv6.address: none
-  name: lxdR1R3
-- config:
-    ipv4.address: none
-    ipv6.address: none
-  name: lxdIXP
-- config:
-    ipv4.address: none
-    ipv6.address: none
-  name: lxdR2R3
-- config:
-    ipv4.address: none
-    ipv6.address: none
-  name: lxdR2C1
-- config:
-    ipv4.address: none
-    ipv6.address: none
-  name: lxdR3C2
 storage_pools:
 - config:
   description: ""
