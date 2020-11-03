@@ -35,6 +35,12 @@
   <div class="post-content">
     <iframe src="/console/admin/" width="100%" height="480"></iframe>
 
+<h2 id="control-multicast-snooping-inside-the-bridge">Control multicast snooping inside the bridge</h2>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ echo 0 | sudo tee /sys/devices/virtual/net/lxdbr0/bridge/multicast_snooping
+$ echo 1 | sudo tee /sys/devices/virtual/net/lxdbr0/bridge/multicast_snooping
+</code></pre></div></div>
+
   </div>
 
 </article>
