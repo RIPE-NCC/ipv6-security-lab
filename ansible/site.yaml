@@ -46,6 +46,11 @@
           - git
           - make
           - man
+          - nftables
+          - nmap
+          - nano
+          - joe
+          - vim
 
     - name: Upgrade pip
       delegate_to: hostA
@@ -92,6 +97,17 @@
       git:
         repo: https://github.com/aatlasis/chiron
         dest: /root/Chiron
+
+    - name: Make Chiron binaries executable
+      delegate_to: hostA
+      shell: "chmod +x /root/Chiron/bin/*"
+
+    - name: Add Chiron to PATH
+      delegate_to: hostA
+      lineinfile:
+        line: "PATH=$PATH:$HOME/bin:$HOME/Chiron/bin"
+        regexp: "^PATH="
+        dest: /root/.bash_profile
 
     - name: Clone the THC-IPv6 repository
       delegate_to: hostA
