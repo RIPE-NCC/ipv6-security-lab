@@ -97,6 +97,7 @@
       git:
         repo: https://github.com/aatlasis/chiron
         dest: /root/Chiron
+        force: yes
 
     - name: Make Chiron binaries executable
       delegate_to: hostA
@@ -107,7 +108,7 @@
       lineinfile:
         line: "PATH=$PATH:$HOME/bin:$HOME/Chiron/bin"
         regexp: "^PATH="
-        dest: /root/.bash_profile
+        dest: /root/.bashrc
 
     - name: Clone the THC-IPv6 repository
       delegate_to: hostA
