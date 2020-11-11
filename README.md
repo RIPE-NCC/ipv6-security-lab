@@ -25,9 +25,6 @@ megabytes will be downloaded during the process.
 Stopping, restarting and destroying the lab
 -------------------------------------------
 
-If you want to retain the settings of virtual routers, make sure you save their
-configuration by issuing the `write` command into the routers' consoles.
-
 Then, you can turn off the VM by running `vagrant halt` in the same directory
 you run `vagrant up` before. You can use the latter command to restart the lab
 later.
