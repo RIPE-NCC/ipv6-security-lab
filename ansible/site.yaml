@@ -42,7 +42,9 @@
           - make
           - man
           - nftables
+          - iptables
           - nmap
+          - termshark
           - nano
           - joe
           - vim
