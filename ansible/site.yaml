@@ -10,7 +10,7 @@
         stdin: "{{ lookup('file', 'lxd_preseed.yaml') }}"
         creates: /var/lib/lxd/networks/lxdbr0
 
-    - name: Create first Centos7 container
+    - name: Create first container
       lxd_container:
         name: hostA
         state: started
@@ -19,30 +19,25 @@
           mode: pull
           server: https://images.linuxcontainers.org
           protocol: lxd # if you get a 404, try setting protocol: simplestreams
-          alias: centos/7/amd64
+          alias: ubuntu/focal/amd64
         profiles: ["default"]
         wait_for_ipv4_addresses: true
 
-    - name: Install epel-release
-      delegate_to: hostA
-      package:
-        name: epel-release
 
     - name: Install necessary packages
       delegate_to: hostA
       package:
         update_cache: true
         name:
-          - python-pip
+          - python3-apt
+          - python3-pip
           - python3
           - tcpdump
           - wget
-          - libpcap-devel
-          - openssl-devel
+          - libpcap-dev
+          - libssl-dev
           - gcc
-          - libssl*
-          - libnetfilter_queue-devel
-          - python-setuptools
+          - python3-setuptools
           - git
           - make
           - man
@@ -52,23 +47,22 @@
           - joe
           - vim
 
-    - name: Upgrade pip
+    - name: Upgrade pip3
       delegate_to: hostA
       pip:
-        executable: pip
+        executable: pip3
         state: latest
         name: pip
 
     - name: Install python packages
       delegate_to: hostA
       pip:
-        executable: pip
+        executable: pip3
         state: latest
         name:
-          - scapy
+          - scapy[basic]
           - cryptography
           - netaddr
-          - ipython==5.10.0
 
     - name: Clone IPv6 toolkit repository
       delegate_to: hostA
@@ -91,24 +85,6 @@
         cmd: make install
         chdir: /usr/src/ipv6toolkit
       when: compile_toolkit.changed
-
-    - name: Clone the Chiron repository
-      delegate_to: hostA
-      git:
-        repo: https://github.com/aatlasis/chiron
-        dest: /root/Chiron
-        force: yes
-
-    - name: Make Chiron binaries executable
-      delegate_to: hostA
-      shell: "chmod +x /root/Chiron/bin/*"
-
-    - name: Add Chiron to PATH
-      delegate_to: hostA
-      lineinfile:
-        line: "PATH=$PATH:$HOME/bin:$HOME/Chiron/bin"
-        regexp: "^PATH="
-        dest: /root/.bashrc
 
     - name: Clone the THC-IPv6 repository
       delegate_to: hostA
