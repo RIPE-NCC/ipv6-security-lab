@@ -137,6 +137,15 @@
         - name: hostC
           mac: 00:16:3e:ee:00:0c
 
+    - name: Restart containers
+      lxd_container:
+        name: "{{ item.name }}"
+        state: restarted
+      with_items:
+        - name: hostA
+        - name: hostB
+        - name: hostC
+
 - name: Host provision
   hosts: default
   become: true
