@@ -3,7 +3,7 @@ Vagrant-based personal network lab - IPv6 Security
 
 This is a small self contained lab for playing with IPv6 security tools. It uses [VirtualBox](https://www.virtualbox.org/) to run a virtual
 Linux server hosting a few [LXD](https://linuxcontainers.org/lxd/) containers
-running CentOS 7. For a convenient access to
+running Ubuntu Linux. For a convenient access to
 the consoles of the virtual routers, [ttyd](https://github.com/tsl0922/ttyd) is
 used to provide web-based terminal access.
 
