@@ -11,4 +11,8 @@ $(function() {
     }
     return false;
   });
+  $("a.refresher").click(function(){
+    $(this).siblings("iframe")[0].contentDocument.location.reload(true);
+    return false;
+  });
 });
