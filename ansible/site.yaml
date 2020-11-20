@@ -211,6 +211,14 @@
         group: www-data
         mode: 0644
 
+    - name: Deploy version file
+      copy:
+        src: ../../version.txt
+        dest: /var/www/html/
+        owner: www-data
+        group: www-data
+        mode: 0644
+
     - name: Install fancy 404 page
       lineinfile:
         path: "/etc/nginx/sites-available/default"
