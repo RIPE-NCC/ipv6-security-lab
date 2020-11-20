@@ -20,6 +20,7 @@
           server: https://images.linuxcontainers.org
           protocol: lxd # if you get a 404, try setting protocol: simplestreams
           alias: ubuntu/focal/amd64
+          volatile.eth0.hwaddr: "00:16:3e:ee:00:0a"
         profiles: ["default"]
         wait_for_ipv4_addresses: true
 
@@ -115,11 +116,6 @@
         chdir: /usr/src/thc-ipv6
       when: compile_thc.changed
 
-    - name: Stop the container
-      lxd_container:
-        name: hostA
-        state: stopped
-
     - name: Clone container
       command:
         cmd: "lxc cp hostA {{ item }}"
@@ -135,8 +131,6 @@
           volatile.eth0.hwaddr: "{{ item.mac }}"
         state: started
       with_items:
-        - name: hostA
-          mac: 00:16:3e:ee:00:0a
         - name: hostB
           mac: 00:16:3e:ee:00:0b
         - name: hostC
@@ -167,11 +161,23 @@
         warn: false
         creates: /usr/lib/python3/dist-packages/apt/package.py
 
+    - name: Import Debian stretch repo key (for tmux 2.3)
+      apt_key:
+        url: "https://ftp-master.debian.org/keys/archive-key-9.asc"
+
+    - name: Enable Debian stretch repo (for tmux 2.3)
+      apt_repository:
+        repo: deb http://deb.debian.org/debian stretch main
+
+    - name: Install tmux from Debian Stretch
+      apt:
+        package: tmux
+        default_release: stretch
+
     - name: Install necessary packages
       apt:
         package:
           - nginx
-          - tmux
           - libwebsockets8
 
     - name: Setup WebSockets connection upgrade
