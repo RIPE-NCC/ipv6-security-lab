@@ -120,6 +120,7 @@
       command:
         cmd: "lxc cp hostA {{ item }}"
         creates: "/var/lib/lxd/containers/{{ item }}"
+      register: cloned
       with_items:
         - hostB
         - hostC
@@ -130,7 +131,11 @@
         config:
           volatile.eth0.hwaddr: "{{ item.mac }}"
         state: started
+      when: cloned.changed
+      register: staticmac
       with_items:
+        - name: hostA
+          mac: 00:16:3e:ee:00:0a
         - name: hostB
           mac: 00:16:3e:ee:00:0b
         - name: hostC
@@ -140,6 +145,7 @@
       lxd_container:
         name: "{{ item.name }}"
         state: restarted
+      when: staticmac.changed
       with_items:
         - name: hostA
         - name: hostB
@@ -161,13 +167,25 @@
         warn: false
         creates: /usr/lib/python3/dist-packages/apt/package.py
 
-    - name: Import Debian stretch repo key (for tmux 2.3)
+    - name: Import Debian Stretch repo key (for tmux 2.3)
       apt_key:
         url: "https://ftp-master.debian.org/keys/archive-key-9.asc"
 
-    - name: Enable Debian stretch repo (for tmux 2.3)
+    - name: Enable Debian Stretch repo (for tmux 2.3)
       apt_repository:
         repo: deb http://deb.debian.org/debian stretch main
+
+    - name: Check tmux version
+      command: tmux -V
+      changed_when: false
+      ignore_errors: true
+      register: tmux_v
+
+    - name: Uninstall newer tmux
+      apt:
+        package: tmux
+        state: absent
+      when: tmux_v.stdout != "tmux 2.3"
 
     - name: Install tmux from Debian Stretch
       apt:
@@ -251,8 +269,8 @@
 
     - name: Deploy tmux config file
       copy:
-        src: ttyd-tmux.conf
-        dest: "/opt/"
+        src: tmux.conf
+        dest: "/etc/"
         mode: 0644
 
     - name: Deploy ttyd-container unit files
