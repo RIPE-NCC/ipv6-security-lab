@@ -31,3 +31,11 @@ later.
 
 You can destroy the lab environment by issuing `vagrant destroy`. A subsequent
 call of `vagrant up` will bring up a completely fresh environment.
+
+Upgrading to a new version of the lab
+-------------------------------------
+
+From time to time, a new version of the lab is released. You can spot it by
+the contents of `version.txt` file. If you want to upgrade, just destroy the VM
+using `vagrant destroy`, delete lab directory and download a new version
+(continue from bullet 3 above).
