@@ -14,13 +14,14 @@
       lxd_container:
         name: hostA
         state: started
+        config:
+          volatile.eth0.hwaddr: "00:16:3e:ee:00:0a"
         source:
           type: image
           mode: pull
           server: https://images.linuxcontainers.org
-          protocol: lxd # if you get a 404, try setting protocol: simplestreams
-          alias: ubuntu/focal/amd64
-          volatile.eth0.hwaddr: "00:16:3e:ee:00:0a"
+          protocol: simplestreams
+          alias: ubuntu/focal
         profiles: ["default"]
         wait_for_ipv4_addresses: true
 
@@ -117,39 +118,21 @@
       when: compile_thc.changed
 
     - name: Clone container
-      command:
-        cmd: "lxc cp hostA {{ item }}"
-        creates: "/var/lib/lxd/containers/{{ item }}"
-      register: cloned
-      with_items:
-        - hostB
-        - hostC
-
-    - name: Setup static MAC address
       lxd_container:
         name: "{{ item.name }}"
         config:
           volatile.eth0.hwaddr: "{{ item.mac }}"
         state: started
-      when: cloned.changed
-      register: staticmac
+        source:
+          type: copy
+          source: hostA
+        profiles: ["default"]
+        wait_for_ipv4_addresses: true
       with_items:
-        - name: hostA
-          mac: 00:16:3e:ee:00:0a
         - name: hostB
           mac: 00:16:3e:ee:00:0b
         - name: hostC
           mac: 00:16:3e:ee:00:0c
-
-    - name: Restart containers
-      lxd_container:
-        name: "{{ item.name }}"
-        state: restarted
-      when: staticmac.changed
-      with_items:
-        - name: hostA
-        - name: hostB
-        - name: hostC
 
 - name: Host provision
   hosts: default
