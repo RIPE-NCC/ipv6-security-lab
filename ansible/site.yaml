@@ -249,14 +249,9 @@
         state: started
         enabled: on
 
-    - name: Install ttyd
-      # We use a locally complied binary until this gets fixed:
-      # https://github.com/tsl0922/ttyd/issues/414
-      #
-      #get_url:
-        #url: https://github.com/tsl0922/ttyd/releases/download/1.6.1/ttyd_linux.x86_64
-      copy:
-        src: ttyd
+    - name: Download ttyd
+      get_url:
+        url: https://github.com/tsl0922/ttyd/releases/download/1.6.3/ttyd.x86_64
         dest: /opt/ttyd
         mode: 0755
 
