@@ -6,7 +6,7 @@ User=vagrant
 Group=www-data
 RuntimeDirectory=ttyd-container
 UMask=0002
-ExecStart=/opt/ttyd -i /run/ttyd-container/%i.sock -t fontSize=14 -t disableLeaveAlert=true tmux -L %i set -g default-command "lxc exec %i -t -- bash" \; new -A -D -s %i
+ExecStart=/opt/ttyd -i /run/ttyd-container/%i.sock -t fontSize=14 -t disableLeaveAlert=true tmux -2 -L %i set -g default-command "lxc exec %i -t -- bash" \; new -A -D -s %i
 Type=simple
 Restart=always
 

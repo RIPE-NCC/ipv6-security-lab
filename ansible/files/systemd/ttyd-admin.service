@@ -6,7 +6,7 @@ User=vagrant
 Group=www-data
 RuntimeDirectory=ttyd-admin
 UMask=0002
-ExecStart=/opt/ttyd -i /run/ttyd-admin/admin.sock -t fontSize=14 -t disableLeaveAlert=true tmux new -A -D -s admin
+ExecStart=/opt/ttyd -i /run/ttyd-admin/admin.sock -t fontSize=14 -t disableLeaveAlert=true tmux -2 new -A -D -s admin
 Type=simple
 Restart=always
 
