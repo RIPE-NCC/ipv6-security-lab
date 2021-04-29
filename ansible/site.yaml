@@ -51,7 +51,7 @@
           - nftables
           - iptables
           - nmap
-          - termshark
+          - tshark
           - nano
           - joe
           - vim
@@ -116,6 +116,16 @@
         cmd: make install
         chdir: /usr/src/thc-ipv6
       when: compile_thc.changed
+
+    - name: Download Termshark
+      delegate_to: hostA
+      unarchive:
+        src: https://github.com/gcla/termshark/releases/download/v2.2.0/termshark_2.2.0_linux_x64.tar.gz
+        remote_src: yes
+        dest: /usr/local/bin/
+        extra_opts:
+          - --transform
+          - "s_^.*/__"
 
     - name: Clone container
       lxd_container:
