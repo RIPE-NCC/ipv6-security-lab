@@ -11,15 +11,16 @@ The lab is highly customizable using [Vagrant](https://www.vagrantup.com/) to
 provide the virtual server and [Ansible](https://www.ansible.com/) to do the
 configuration. It should work on Windows, macOS and Linux.
 
-Installation
-------------
+Installation of the pre-packaged release (recommended)
+------------------------------------------------------
 
   1. Install [VirtualBox](https://www.virtualbox.org/)
   2. Install [Vagrant](https://www.vagrantup.com/)
-  3. Clone or [download](https://gitlab.ripe.net/lnd/ipv6-security-lab/-/archive/ipv6_security/ipv6-security-lab-ipv6_security.zip) and unpack ZIP of this repository somewhere
-  4. Open a terminal window, enter the cloned repository (using `cd` command) directory and run `vagrant up`
-  5. Wait a few minutes until vagrant finishes the preparation. Several hundred
-megabytes will be downloaded during the process.
+  3. Create an empty folder (for instance `~/ripencc/ipv6seclab`) and open
+     terminal there
+  4. Open a terminal window, enter the empty directory (using `cd` command) directory and run `vagrant init oskar456/ipv6seclab` followed by `vagrant up`
+  5. Wait a few minutes until vagrant finishes downloading the VM image. The
+     size of the image is approximatelly 2 GiB.
   6. Access the lab environment by pointing your web browser to [`http://localhost:8080/`](http://localhost:8080/)
   
 Stopping, restarting and destroying the lab
@@ -36,6 +37,14 @@ Upgrading to a new version of the lab
 -------------------------------------
 
 From time to time, a new version of the lab is released. You can spot it by
-the contents of `version.txt` file. If you want to upgrade, just destroy the VM
-using `vagrant destroy`, delete lab directory and download a new version
-(continue from bullet 3 above).
+the contents of `version.txt` file. If you want to upgrade, run these commands:
+
+    vagrant destroy
+    vagrant box update
+    vagrant up
+
+Running the development version
+-------------------------------
+
+You can also clone or download this repository and run `vagrant up` there. This
+should build a completely new environment from scratch.
