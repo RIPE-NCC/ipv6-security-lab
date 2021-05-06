@@ -1,0 +1,24 @@
+<style>
+    :host {
+        margin: 12px;
+    }
+    iframe {
+        min-width: 320px;
+        min-height: 100px;
+        width:  640px;
+        height: 480px;
+        resize: both;
+        overflow: hidden;
+
+    }
+    div.vm-console {
+        float: left;
+    }
+</style>
+<div class="vm-console">
+  <slot></slot>
+  <a href="#" id="refresher">⟳</a>
+  <a id="popout" target="_blank">pop out</a>
+  <br>
+  <iframe></iframe>
+</div>

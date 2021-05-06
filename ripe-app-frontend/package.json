@@ -1,0 +1,31 @@
+{
+  "name": "workbench-shell",
+  "version": "0.1",
+  "description": "The locally-installed RIPE NCC Workbench",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack serve --progress --port 4042",
+    "build:clean": "rimraf build/*",
+    "build": "webpack"
+  },
+  "keywords": [
+    "RIPE NCC",
+    "Workbench"
+  ],
+  "author": "RIPE NCC L&D",
+  "license": "ISC",
+  "dependencies": {
+    "@technical-design/ripe-app-webcomponents": "^1.3.4",
+    "copy-webpack-plugin": "^8.1.1",
+    "css-loader": "^5.2.4",
+    "html-loader": "^2.1.2",
+    "mini-css-extract-plugin": "^1.6.0",
+    "style-loader": "^2.0.0",
+    "webpack": "^5.36.2",
+    "webpack-dev-server": "^3.11.2"
+  },
+  "devDependencies": {
+    "css-minimizer-webpack-plugin": "^2.0.0",
+    "webpack-cli": "^4.6.0"
+  }
+}

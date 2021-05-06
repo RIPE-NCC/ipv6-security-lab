@@ -1,0 +1,2 @@
+(self.webpackChunkworkbench_shell=self.webpackChunkworkbench_shell||[]).push([["app_workspaces_404_index_js"],{"./app/workspaces/404/index.js":(e,s,a)=>{"use strict";a.r(s),a.d(s,{loadWorkSpace:()=>c});const c=async()=>{const e=document.querySelector("div#csr-workspace"),s=await a.e("app_workspaces_404_index_html").then(a.bind(a,"./app/workspaces/404/index.html"));e.innerHTML=`${s.default}`}}}]);
+//# sourceMappingURL=app_workspaces_404_index_js.bundle.js.map

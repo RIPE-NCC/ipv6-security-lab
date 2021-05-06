@@ -1,0 +1,44 @@
+    <style>
+        div.flex {
+          display: flex;
+          flex-wrap: wrap;
+        }
+        div.flex div {
+          float: left;
+          margin: 12px;
+        }
+        textarea {
+          min-width: 320px;
+          min-height: 100px;
+          width: 640px;
+          height: 30%;
+          background-color: black;
+          color: white;
+        }
+    </style>
+    <section>
+       <h2>Dashboard</h2>
+         <div class="flex">
+           <vm-console src="/console/hostA/"><h3>Host A</h3></vm-console>
+           <vm-console src="/console/hostB/"><h3>Host B</h3></vm-console>
+           <vm-console src="/console/hostC/"><h3>Host C</h3></vm-console>
+           <div>
+             <h3>Availaible tools</h3>
+             <ul>
+               <li><a href="https://scapy.net/">Scapy</a></li>
+               <li><a href="https://github.com/vanhauser-thc/thc-ipv6">THC-IPv6</a></li>
+               <li><a href="https://www.si6networks.com/research/tools/ipv6toolkit/">SI6 IPv6 Toolkit</a></li>
+               <li><a href="https://termshark.io/">Termshark</a></li>
+             </ul>
+             <h3>Hints</h3>
+             <ul>
+               <li>Feel free to <strong>resize terminal windows</strong> as you like
+               <li>To scroll inside the tmux, use <code>Ctrl-B</code> and <code>PageUp</code>/<code>PageDown</code> (<code>Fn</code> + <code>Up</code>/<code>Down</code> on Mac)</li>
+               <li>To open new tmux window, use <code>Ctrl-B c</code></li>
+               <li>See <a href="https://tmuxcheatsheet.com/">tmux cheatsheet</a></li>
+             </ul>
+             <h3>Scratchpad</h3>
+             <textarea>Here you can put some text you need to copy and paste.</textarea>
+           </div>
+         </div>
+    </section>

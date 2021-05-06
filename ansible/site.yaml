@@ -3,6 +3,7 @@
 - name: Deploy LXD
   hosts: default
   become: false
+  tags: container
   tasks:
     - name: Initialize LXD
       command:
@@ -147,6 +148,7 @@
 - name: Host provision
   hosts: default
   become: true
+  tags: host
   tasks:
     # This takes a looong time
     #
@@ -222,7 +224,7 @@
 
     - name: Deploy static website
       copy:
-        src: ../../labfrontend/_site/
+        src: ../../ripe-app-frontend/build/
         dest: /var/www/html/
         owner: www-data
         group: www-data
@@ -236,11 +238,11 @@
         group: www-data
         mode: 0644
 
-    - name: Install fancy 404 page
+    - name: Route everything to index.html page
       lineinfile:
         path: "/etc/nginx/sites-available/default"
-        line: "error_page 404 /404.html;"
-        insertafter: "^\\s*root /var/www/html;$"
+        line: "		try_files $uri /index.html;"
+        regexp: '^\s*try_files \$uri'
       notify: reload nginx
 
     - name: Start Nginx
