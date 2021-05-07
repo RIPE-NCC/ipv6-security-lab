@@ -7,6 +7,6 @@ SERVICEFILE="/etc/systemd/system/ttyd-container@.service"
 
 mkdir -p "$WANTDIR"
 
-for INSTANCE in $(cd /var/lib/lxd/containers/; ls 2> /dev/null); do
+for INSTANCE in {% for host in groups['containers'] %}{{host}} {% endfor %}; do
 	ln -s "$SERVICEFILE" "$WANTDIR/ttyd-container@$INSTANCE.service"
 done
