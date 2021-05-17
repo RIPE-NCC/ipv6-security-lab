@@ -16,8 +16,7 @@ Installation of the pre-packaged release (recommended)
 
   1. Install [VirtualBox](https://www.virtualbox.org/)
   2. Install [Vagrant](https://www.vagrantup.com/)
-  3. Create an empty folder (for instance `~/ripencc/ipv6seclab`) and open
-     terminal there
+  3. Create an empty folder (for instance `~/ripencc/ipv6seclab`)
   4. Open a terminal window, enter the empty directory (using `cd` command) directory and run `vagrant init ripencc/ipv6seclab` followed by `vagrant up`
   5. Wait a few minutes until vagrant finishes downloading the VM image. The
      size of the image is approximatelly 2 GiB.
