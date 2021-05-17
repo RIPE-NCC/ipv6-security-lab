@@ -7,6 +7,7 @@ networks:
     ipv6.nat: true
     ipv6.dhcp: false
     raw.dnsmasq: ra-param=lxdbr0,120
+    bridge.hwaddr: "00:16:3e:ee:00:01"
   description: "Default network"
   name: lxdbr0
 storage_pools:
