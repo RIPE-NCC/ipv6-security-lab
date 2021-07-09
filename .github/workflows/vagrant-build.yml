@@ -1,0 +1,52 @@
+name: Build a release
+# Source: https://github.com/jonashackt/vagrant-github-actions
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'version.txt'
+  workflow_dispatch:
+
+jobs:
+  build-release:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Cache Vagrant boxes
+        uses: actions/cache@v2
+        with:
+          path: ~/.vagrant.d/boxes
+          key: ${{ runner.os }}-vagrant-${{ hashFiles('Vagrantfile') }}
+          restore-keys: |
+            ${{ runner.os }}-vagrant-
+
+      - name: Show Vagrant version
+        run: vagrant --version
+
+      - name: Build the environment
+        run: vagrant up
+
+      - name: Create a Vagrant box
+        run: vagrant package --vagrantfile Vagrantfile-in-box --output ipv6-security-lab-$(cat version.txt).box
+
+      - name: Store box file
+        uses: actions/upload-artifact@v2
+        with:
+          name: vagrant-box
+          path: "ipv6-security-lab-*.box"
+
+      - name: Publish box file in the release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: djn24/add-asset-to-release@v1
+        continue-on-error: true
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: "ipv6-security-lab-*.box"
+
+      - name: Publish box file in the Vagrant Cloud
+        env:
+          ATLAS_TOKEN: ${{ secrets.VAGRANT_CLOUD_TOKEN }}
+        run: vagrant cloud publish ripencc/ipv6seclab $(cat version.txt) virtualbox ipv6-security-lab-$(cat version.txt).box --force
