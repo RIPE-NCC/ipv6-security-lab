@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.20210813.0](https://www.github.com/RIPE-NCC/ipv6-security-lab/compare/v0.20210709.0...v0.20210813.0) (2021-08-13)
+
+
+### Bug Fixes
+
+* ensure exact version of base box ([972b4e1](https://www.github.com/RIPE-NCC/ipv6-security-lab/commit/972b4e1125cf4566d37b71e51d02bd81b05d41c0))
+* workaround ignored ICMPv6 redirects ([60313d1](https://www.github.com/RIPE-NCC/ipv6-security-lab/commit/60313d14532f414794289dcbcee06caf3be99f60))
+
 ## 0.20210709.0 (2021-07-09)
 
 
