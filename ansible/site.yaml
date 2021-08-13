@@ -4,6 +4,11 @@
   hosts: default
   become: false
   tags: container
+  handlers:
+    - name: reboot hostA
+      delegate_to: hostA
+      reboot:
+
   tasks:
     - name: Initialize LXD
       command:
@@ -25,6 +30,35 @@
           alias: ubuntu/focal
         profiles: ["default"]
         wait_for_ipv4_addresses: true
+
+    - name: Disable systemd-networkd IPv6 handling (workaround broken redirects)
+      delegate_to: hostA
+      lineinfile:
+        path: /etc/netplan/10-lxc.yaml
+        insertafter: "^ *dhcp-identifier: mac"
+        line: "      accept-ra: false"
+      notify: reboot hostA
+
+    - name: Enable kernel-level IPv6 autoconf (workaround broken redirects)
+      delegate_to: hostA
+      copy:
+        dest: /etc/sysctl.d/99-accept_ra.conf
+        content: "net.ipv6.conf.eth0.accept_ra = 1"
+      notify: reboot hostA
+
+    - name: Hack enable kernel-level IPv6 autoconf (workaround broken redirects)
+      delegate_to: hostA
+      copy:
+        dest: /etc/rc.local
+        mode: u=rwx,g=rx,o=rx
+        content: '#!/bin/sh
+
+          sysctl -w net.ipv6.conf.eth0.accept_ra=1
+
+          '
+      notify: reboot hostA
+
+    - meta: flush_handlers
 
     - name: Install python3-apt
       delegate_to: hostA
