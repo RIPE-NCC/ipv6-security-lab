@@ -7,6 +7,7 @@
 # you're doing.
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/focal64"
+  config.vm.box_version = "20210603.0.0"
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine and only allow access
