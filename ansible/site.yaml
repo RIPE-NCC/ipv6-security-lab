@@ -9,7 +9,20 @@
       delegate_to: hostA
       reboot:
 
+    - name: reload udev rules
+      command: udevadm control --reload-rules
+      become: true
+
   tasks:
+    - name: Disable lxdbr0 multicast snooping
+      become: true
+      copy:
+        dest: /etc/udev/rules.d/99-disable-lxdbr0-mcast-snooping.rules
+        content: SUBSYSTEM=="net", ACTION=="add", KERNEL=="lxdbr0", RUN+="/bin/sh -c 'echo 0 > /sys/class/net/lxdbr0/bridge/multicast_snooping'"
+      notify: reload udev rules
+
+    - meta: flush_handlers
+
     - name: Initialize LXD
       command:
         cmd: lxd init --preseed
