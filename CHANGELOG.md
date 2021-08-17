@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.20210814.0](https://www.github.com/RIPE-NCC/ipv6-security-lab/compare/v0.20210813.0...v0.20210814.0) (2021-08-17)
+
+
+### Features
+
+* Disable multicast snooping on lxdbr0 by default ([2580b2c](https://www.github.com/RIPE-NCC/ipv6-security-lab/commit/2580b2c63d704a147e5dcc7c1a54bebe9040b9ae))
+* frontend update ([c47e88e](https://www.github.com/RIPE-NCC/ipv6-security-lab/commit/c47e88eeacd48ee296ee9ab67a61aea1c87e59ad))
+
+
+### Bug Fixes
+
+* disable shared folder, workaround serial port issue on Windows ([5938407](https://www.github.com/RIPE-NCC/ipv6-security-lab/commit/5938407dcd8921839591ce9ae16018cb160d53ff))
+
 ## [0.20210813.0](https://www.github.com/RIPE-NCC/ipv6-security-lab/compare/v0.20210709.0...v0.20210813.0) (2021-08-13)
 
 
