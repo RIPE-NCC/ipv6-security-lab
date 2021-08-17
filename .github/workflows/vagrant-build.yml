@@ -26,6 +26,9 @@ jobs:
       - name: Show Vagrant version
         run: vagrant --version
 
+      - name: Show VirtualBox version
+        run: VBoxManage --version
+
       - name: Build the environment
         run: vagrant up
 
