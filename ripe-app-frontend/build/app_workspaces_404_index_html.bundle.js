@@ -1,2 +1,1 @@
-(self.webpackChunkworkbench_shell=self.webpackChunkworkbench_shell||[]).push([["app_workspaces_404_index_html"],{"./app/workspaces/404/index.html":(e,s,n)=>{"use strict";n.r(s),n.d(s,{default:()=>h});const h="<section>\n  <h2>Not found</h2>\n</section>\n"}}]);
-//# sourceMappingURL=app_workspaces_404_index_html.bundle.js.map
+"use strict";(self.webpackChunkworkbench_shell=self.webpackChunkworkbench_shell||[]).push([["app_workspaces_404_index_html"],{"./app/workspaces/404/index.html":(e,s,n)=>{n.r(s),n.d(s,{default:()=>h});const h="<section>\n  <h2>Not found</h2>\n</section>\n"}}]);
