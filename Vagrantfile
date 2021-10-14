@@ -32,7 +32,7 @@ Vagrant.configure("2") do |config|
      gpasswd -a vagrant lxd
      add-apt-repository -y ppa:ansible/ansible
      export DEBIAN_FRONTEND=noninteractive
-     apt-get -y install ansible-base python3-packaging
+     apt-get -y install ansible-core python3-packaging
      ansible-galaxy collection install community.general -p /usr/share/ansible/collections
   SHELL
   config.vm.provision "ansible_local" do |ansible|
