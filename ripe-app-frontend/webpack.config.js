@@ -13,7 +13,7 @@ module.exports = {
   mode: "development",
   devtool: "cheap-module-source-map",
   devServer: {
-        contentBase: dir_build,
+        static: dir_build,
         compress: true,
         historyApiFallback: true,
         port: 4022,

@@ -15,14 +15,14 @@
   "author": "RIPE NCC L&D",
   "license": "ISC",
   "dependencies": {
-    "@technical-design/ripe-app-webcomponents": "^1.4.1",
+    "@technical-design/ripe-app-webcomponents": "^1.5.3",
     "copy-webpack-plugin": "^9.0.1",
     "css-loader": "^6.2.0",
     "html-loader": "^2.1.2",
     "mini-css-extract-plugin": "^2.2.0",
     "style-loader": "^3.2.1",
     "webpack": "^5.50.0",
-    "webpack-dev-server": "^3.11.2"
+    "webpack-dev-server": "^4.3.1"
   },
   "devDependencies": {
     "css-minimizer-webpack-plugin": "^3.0.2",
