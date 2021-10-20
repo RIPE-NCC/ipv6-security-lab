@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.20210815.0](https://www.github.com/RIPE-NCC/ipv6-security-lab/compare/v0.20210814.0...v0.20210815.0) (2021-10-20)
+
+
+### Features
+
+* update Termshark to 2.3.0 ([5026edc](https://www.github.com/RIPE-NCC/ipv6-security-lab/commit/5026edc61a88618dca4a72c718e22bd21ddccd92))
+
+
+### Bug Fixes
+
+* ansible-base got renamed to ansible-core ([b7f39c0](https://www.github.com/RIPE-NCC/ipv6-security-lab/commit/b7f39c0a90c4f0ec29b1d17c291c38cb83e73d07))
+* Use rsync instead of shared folders ([ee1de25](https://www.github.com/RIPE-NCC/ipv6-security-lab/commit/ee1de255f5780d974aa88b59f2293855014c6e65))
+
 ## [0.20210814.0](https://www.github.com/RIPE-NCC/ipv6-security-lab/compare/v0.20210813.0...v0.20210814.0) (2021-08-17)
 
 
