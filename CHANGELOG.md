@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.20211020.1](https://www.github.com/RIPE-NCC/ipv6-security-lab/compare/v0.20211020.0...v0.20211020.1) (2021-10-20)
+
+
+### Bug Fixes
+
+* use macos-10.15 in GitHub action ([741758c](https://www.github.com/RIPE-NCC/ipv6-security-lab/commit/741758cc50ea57b23fbd97d26f78e7c7988418cb))
+
 ## [0.20211020.0](https://www.github.com/RIPE-NCC/ipv6-security-lab/compare/v0.20210814.0...v0.20211020.0) (2021-10-20)
 
 
