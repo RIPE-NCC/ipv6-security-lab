@@ -42,6 +42,21 @@ the contents of `version.txt` file. If you want to upgrade, run these commands:
     vagrant box update
     vagrant up
 
+Resolving port conflict
+-----------------------
+
+In case there is some other software listening on local port 8080, Vagrant will refuse
+to start. You can either stop the offending software or adjust Vagrantfile to change
+the port number. For example, this is how you move the environment from port 8080 to
+port 8081:
+
+```ruby
+config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1", id: "web", disabled: true
+config.vm.network "forwarded_port", guest: 80, host: 8081, host_ip: "127.0.0.1"
+```
+
+Then you can find the lab environment on [`http://localhost:8081/`](http://localhost:8081/)
+
 Running the development version
 -------------------------------
 
