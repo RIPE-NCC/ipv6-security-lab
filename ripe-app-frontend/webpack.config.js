@@ -19,7 +19,7 @@ module.exports = {
         port: 4022,
         proxy: [{
             context: ['/console/hostA', '/console/hostB', '/console/hostC', '/console/admin', '/version.txt'],
-            target: 'http://localhost:8080',
+            target: 'http://127.0.0.1:8080',
             ws: true
         }]
   },
