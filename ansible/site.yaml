@@ -300,7 +300,7 @@
 
     - name: Download ttyd
       get_url:
-        url: https://github.com/tsl0922/ttyd/releases/download/1.6.3/ttyd.x86_64
+        url: https://github.com/tsl0922/ttyd/releases/download/1.7.2/ttyd.x86_64
         dest: /opt/ttyd
         mode: 0755
 
