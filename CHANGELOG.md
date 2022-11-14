@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.20221114.0](https://www.github.com/RIPE-NCC/ipv6-security-lab/compare/v0.20211020.1...v0.20221114.0) (2022-11-14)
+
+
+### Features
+
+* frontend update ([d4464f5](https://www.github.com/RIPE-NCC/ipv6-security-lab/commit/d4464f5b5e61474efb9225c033d52d7175ff8f73))
+* Upgrade ttyd to 1.7.2 ([28991b9](https://www.github.com/RIPE-NCC/ipv6-security-lab/commit/28991b91f42ec52b87479abe1d2bffeb1b302a2d))
+
 ### [0.20211020.1](https://www.github.com/RIPE-NCC/ipv6-security-lab/compare/v0.20211020.0...v0.20211020.1) (2021-10-20)
 
 
