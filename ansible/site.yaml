@@ -177,7 +177,7 @@
 
     - name: Download Termshark arm64
       delegate_to: hostA
-      when: ansible_architecture == "arm64"
+      when: ansible_architecture == "aarch64"
       unarchive:
         src: https://github.com/gcla/termshark/releases/download/v2.4.0/termshark_2.4.0_linux_arm64.tar.gz
         remote_src: yes
