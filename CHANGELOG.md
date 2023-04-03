@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.20230403.0](https://www.github.com/RIPE-NCC/ipv6-security-lab/compare/v0.20221114.0...v0.20230403.0) (2023-04-03)
+
+
+### Features
+
+* support Ubuntu auto-install, upgrade host to Ubuntu 22.04 ([b34e011](https://www.github.com/RIPE-NCC/ipv6-security-lab/commit/b34e0116adf75bf18aada1e71f320d6c0884d69c))
+
+
+### Bug Fixes
+
+* remove obsolete Ansible syntax ([ddb8601](https://www.github.com/RIPE-NCC/ipv6-security-lab/commit/ddb86017a5e66b0b4c679dac4526cb51af2cb440))
+
+
+### Miscellaneous Chores
+
+* release 0.20230403.0 ([c13aad6](https://www.github.com/RIPE-NCC/ipv6-security-lab/commit/c13aad6162ae6713fdf7d5d4fdd90ab4514fa4c9))
+
 ## [0.20221114.0](https://www.github.com/RIPE-NCC/ipv6-security-lab/compare/v0.20211020.1...v0.20221114.0) (2022-11-14)
 
 
