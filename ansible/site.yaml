@@ -355,6 +355,11 @@
       become: true
       changed_when: false
 
+    - name: Trim unused host space
+      command: fstrim -av
+      become: true
+      changed_when: false
+
   handlers:
     - name: reload nginx
       service:
