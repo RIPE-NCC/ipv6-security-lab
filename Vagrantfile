@@ -6,7 +6,7 @@
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 Vagrant.configure("2") do |config|
-  config.vm.box = "ubuntu/focal64"
+  config.vm.box = "ubuntu/jammy64"
   # config.vm.box_version = "20210603.0.0"
 
   config.vm.synced_folder ".", "/vagrant", type: "rsync",

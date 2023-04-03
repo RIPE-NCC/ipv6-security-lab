@@ -165,10 +165,22 @@
         chdir: /usr/src/thc-ipv6
       when: compile_thc.changed
 
-    - name: Download Termshark
+    - name: Download Termshark x64
       delegate_to: hostA
+      when: ansible_architecture == "x86_64"
       unarchive:
-        src: https://github.com/gcla/termshark/releases/download/v2.3.0/termshark_2.3.0_linux_x64.tar.gz
+        src: https://github.com/gcla/termshark/releases/download/v2.4.0/termshark_2.4.0_linux_x64.tar.gz
+        remote_src: yes
+        dest: /usr/local/bin/
+        extra_opts:
+          - --transform
+          - "s_^.*/__"
+
+    - name: Download Termshark arm64
+      delegate_to: hostA
+      when: ansible_architecture == "arm64"
+      unarchive:
+        src: https://github.com/gcla/termshark/releases/download/v2.4.0/termshark_2.4.0_linux_arm64.tar.gz
         remote_src: yes
         dest: /usr/local/bin/
         extra_opts:
@@ -300,7 +312,7 @@
 
     - name: Download ttyd
       get_url:
-        url: https://github.com/tsl0922/ttyd/releases/download/1.7.2/ttyd.x86_64
+        url: "https://github.com/tsl0922/ttyd/releases/download/1.7.3/ttyd.{{ ansible_architecture }}"
         dest: /opt/ttyd
         mode: 0755
 
@@ -311,7 +323,7 @@
         mode: 0644
 
     - name: Deploy ttyd-container unit files
-      copy:
+      template:
         src: "systemd/{{ item }}"
         dest: "/etc/systemd/system/"
         mode: 0644

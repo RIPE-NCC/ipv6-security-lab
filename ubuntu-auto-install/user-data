@@ -1,0 +1,46 @@
+#cloud-config
+autoinstall:
+  snaps:
+    - name: lxd
+  packages:
+    - python3-packaging
+    - python3-pip
+    - git
+  identity:
+    hostname: ipv6seclab
+    username: ubuntu
+    password: $6$exDY1mhS4KUYCE/2$zmn9ToZwTKLhCw.b4/b.ZRTIZM30JZ4QrOQ2aOXJ8yk96xpcCof0kxKwuX1kqLG/ygbJ1f8wxED22bTL4F46P0
+  late-commands:
+    - "curtin in-target -- bash -c 'mkdir -p /etc/systemd/system/getty@.service.d/; echo -e \"[Service]\nTTYVTDisallocate=no\nExecStart=\nExecStart=-/sbin/agetty -o '\\''-p -- \\\\u'\\'' --autologin ubuntu --noclear %I \\$TERM\" > /etc/systemd/system/getty@.service.d/override.conf'"
+    - "curtin in-target -- bash -c 'echo -e \"#!/bin/bash\nif [[ \\$USER == ubuntu && \\\"\\$XDG_SESSION_TYPE\\\" == tty ]]; then\n\techo\n\techo -n Please wait until cloud-init finishes with \\\"status: done\\\"\n\tcloud-init status --wait\nfi\" > /etc/profile.d/ZZ-wait-cloud-init.sh'"
+  user-data:
+    users:
+      - name: ubuntu
+        sudo: ALL=(ALL) NOPASSWD:ALL
+    runcmd:
+     - [ passwd, -d, ubuntu ]
+    ansible:
+      install_method: pip
+      package_name: ansible
+      run_user: ubuntu
+      galaxy:
+        actions:
+          - ["ansible-galaxy", "collection", "install", "community.general", "ansible.posix"]
+      setup_controller:
+        repositories:
+          - path: /home/ubuntu/ipv6-security-lab/
+            source: https://github.com/RIPE-NCC/ipv6-security-lab.git
+        run_ansible:
+          - playbook_dir: /home/ubuntu/ipv6-security-lab/ansible/
+            playbook_name: site.yaml
+            inventory: inventory.ini
+  source:
+    id: ubuntu-server-minimal
+    search_drivers: false
+  storage:
+    swap:
+      size: 0
+    layout:
+      name: direct
+  updates: all
+  version: 1

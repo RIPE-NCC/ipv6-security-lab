@@ -2,7 +2,7 @@
 Description=ttyd-container instance %I
 
 [Service]
-User=vagrant
+User={{ ansible_env.SUDO_USER or ansible_user_id }}
 Group=www-data
 RuntimeDirectory=ttyd-container
 UMask=0002
