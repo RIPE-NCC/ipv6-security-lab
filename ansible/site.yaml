@@ -219,7 +219,7 @@
 
     - name: Enable Debian Stretch repo (for tmux 2.3)
       apt_repository:
-        repo: deb http://deb.debian.org/debian stretch main
+        repo: deb http://archive.debian.org/debian stretch main
 
     - name: Check tmux version
       command: tmux -V
