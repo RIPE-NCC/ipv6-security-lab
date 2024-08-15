@@ -1,5 +1,13 @@
 # Changelog
 
+### [0.20230403.1](https://www.github.com/RIPE-NCC/ipv6-security-lab/compare/v0.20230403.0...v0.20230403.1) (2024-08-15)
+
+
+### Bug Fixes
+
+* fix Debian Stretch repo location ([f42f93d](https://www.github.com/RIPE-NCC/ipv6-security-lab/commit/f42f93d4661e7d40b30b2604374b3ecc2e9decd0))
+* switch to official Ubuntu images ([5b152de](https://www.github.com/RIPE-NCC/ipv6-security-lab/commit/5b152de185cea89735d313d8231443b2e5eedbc4))
+
 ## [0.20230403.0](https://www.github.com/RIPE-NCC/ipv6-security-lab/compare/v0.20221114.0...v0.20230403.0) (2023-04-03)
 
 
