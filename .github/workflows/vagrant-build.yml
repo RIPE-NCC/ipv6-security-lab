@@ -10,13 +10,13 @@ on:
 
 jobs:
   build-release:
-    runs-on: macos-10.15
+    runs-on: macos-12
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Cache Vagrant boxes
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/.vagrant.d/boxes
           key: ${{ runner.os }}-vagrant-${{ hashFiles('Vagrantfile') }}
@@ -36,14 +36,14 @@ jobs:
         run: vagrant package --vagrantfile Vagrantfile-in-box --output ipv6-security-lab-$(cat version.txt).box
 
       - name: Store box file
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: vagrant-box
           path: "ipv6-security-lab-*.box"
 
       - name: Publish box file in the release
         if: startsWith(github.ref, 'refs/tags/')
-        uses: djn24/add-asset-to-release@v1
+        uses: djn24/add-asset-to-release@v2
         continue-on-error: true
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
