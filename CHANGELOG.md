@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.20240816.0](https://www.github.com/RIPE-NCC/ipv6-security-lab/compare/v0.20230403.0...v0.20240816.0) (2024-08-16)
+
+
+### Bug Fixes
+
+* Add warning about RIPE NCC internal dependency of the frontend ([3ab20e3](https://www.github.com/RIPE-NCC/ipv6-security-lab/commit/3ab20e3088ab23d1d233f535d645da75a26f96b2))
+* fix Debian Stretch repo location ([f42f93d](https://www.github.com/RIPE-NCC/ipv6-security-lab/commit/f42f93d4661e7d40b30b2604374b3ecc2e9decd0))
+* restore kernel-level IPv6 workaround ([b816308](https://www.github.com/RIPE-NCC/ipv6-security-lab/commit/b816308a71ef2ba56e194e877b749d1411e56f98))
+* switch to official Ubuntu images ([5b152de](https://www.github.com/RIPE-NCC/ipv6-security-lab/commit/5b152de185cea89735d313d8231443b2e5eedbc4))
+* update npm dependencies ([85e48f5](https://www.github.com/RIPE-NCC/ipv6-security-lab/commit/85e48f5cc0d4956d8c4089d703907fdb931eb8bc))
+
 ## [0.20230403.0](https://www.github.com/RIPE-NCC/ipv6-security-lab/compare/v0.20221114.0...v0.20230403.0) (2023-04-03)
 
 
