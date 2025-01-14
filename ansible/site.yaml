@@ -237,12 +237,11 @@
 
     - name: Install tmux dependency
       apt:
-        package: libtinfo5
+        package: libtinfo6
 
     - name: Install tmux from Debian Stretch
       apt:
         package: tmux
-        default_release: stretch
 
     - name: Install necessary packages
       apt:
