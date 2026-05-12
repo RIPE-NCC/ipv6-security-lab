@@ -1,4 +1,9 @@
-import { RipeAppWebComponents } from "@technical-design/ripe-app-webcomponents";
+import {
+	AppNavBar,
+	RipeHeader,
+	QuestionMark,
+	LegalAccordion,
+} from "@technical-design/ripe-app-webcomponents";
 import { default as appNavBarMenu } from "./menu.json";
 import { initRouter, routeTo, popStateRouter } from "./router";
 
@@ -7,8 +12,10 @@ import { initRouter, routeTo, popStateRouter } from "./router";
 // by the webpack configs.
 // Note that main.css is the only filename that's tolerated by nginx.
 import "./styles/styles.css";
-import "../node_modules/@technical-design/ripe-app-webcomponents/src/webcomponents/shared/ripe-app-colors.css";
+import "../node_modules/@technical-design/ripe-app-webcomponents/src/style/ripe-app-colors.css";
 
+// Reference the components in some way to prevent your bundler from removing them$
+window.components = [AppNavBar, QuestionMark, RipeHeader, LegalAccordion];
 
 window.addEventListener("onpopstate", function(e) {
   e.preventDefault();
