@@ -1,0 +1,15 @@
+---
+
+arch_transform_debian:
+  x86_64: amd64
+  aarch64: arm64
+
+arch: "{{ arch_transform_debian.get(ansible_facts.architecture, ansible_facts.architecture) }}"
+
+arch_transform_termshark:
+  x86_64: x64
+  aarch64: arm64
+
+arch_termshark: "{{ arch_transform_termshark.get(ansible_facts.architecture, ansible_facts.architecture) }}"
+
+...

@@ -1,0 +1,148 @@
+---
+- name: Host provision
+  hosts: default
+  become: true
+  tags: host
+  tasks:
+    - name: Install python3-apt
+      command:
+        cmd: apt-get -y install python3-apt
+        creates: /usr/lib/python3/dist-packages/apt/package.py
+
+    - name: Install necessary packages
+      apt:
+        package:
+          - nginx
+
+    - name: Setup WebSockets connection upgrade
+      copy:
+        src: nginx/connection_upgrade.conf
+        dest: "/etc/nginx/conf.d/"
+        mode: 0644
+      notify: reload nginx
+
+    - name: Disable absolute redirects
+      lineinfile:
+        line: "absolute_redirect off;"
+        dest: "/etc/nginx/conf.d/no_absolute_redirects.conf"
+        create: yes
+        mode: 0644
+      notify: reload nginx
+
+    - name: Setup ttyd proxy snippet
+      copy:
+        src: nginx/ttydconsole.conf
+        dest: "/etc/nginx/snippets/"
+        mode: 0644
+      notify: reload nginx
+
+    - name: Enable ttyd proxy snippet
+      lineinfile:
+        path: "/etc/nginx/sites-available/default"
+        line: "include /etc/nginx/snippets/ttydconsole.conf;"
+        insertbefore: "^\\s*location / {.*$"
+      notify: reload nginx
+
+    - name: Setup no cache snippet
+      copy:
+        src: nginx/nocache.conf
+        dest: "/etc/nginx/snippets/"
+        mode: 0644
+      notify: reload nginx
+
+    - name: Enable no cache snippet
+      lineinfile:
+        path: "/etc/nginx/sites-available/default"
+        line: "include /etc/nginx/snippets/nocache.conf;"
+        insertbefore: "^\\s*location / {.*$"
+      notify: reload nginx
+
+
+    - name: Deploy static website
+      copy:
+        src: ../../ripe-app-frontend/build/
+        dest: /var/www/html/
+        owner: www-data
+        group: www-data
+        mode: 0644
+
+    - name: Deploy version file
+      copy:
+        src: ../../version.txt
+        dest: /var/www/html/
+        owner: www-data
+        group: www-data
+        mode: 0644
+
+    - name: Route everything to index.html page
+      lineinfile:
+        path: "/etc/nginx/sites-available/default"
+        line: "		try_files $uri /index.html;"
+        regexp: '^\s*try_files \$uri'
+      notify: reload nginx
+
+    - name: Start Nginx
+      service:
+        name: nginx
+        state: started
+        enabled: on
+
+    - name: Download ttyd
+      get_url:
+        url: "https://github.com/tsl0922/ttyd/releases/download/1.7.7/ttyd.{{ ansible_facts['architecture'] }}"
+        dest: /opt/ttyd
+        mode: 0755
+
+    - name: Deploy tmux config file
+      copy:
+        src: tmux.conf
+        dest: "/etc/"
+        mode: 0644
+
+    - name: Deploy ttyd-container unit files
+      template:
+        src: "systemd/{{ item }}"
+        dest: "/etc/systemd/system/"
+        mode: 0644
+      notify: systemctl daemon-reload
+      with_items:
+        - ttyd-container@.service
+        - ttyd-admin.service
+        - ttyd-container.target
+
+    - name: Deploy ttyd-container generator
+      template:
+        src: systemd/ttyd-container.generator
+        dest: "/etc/systemd/system-generators/"
+        mode: 0755
+      notify: systemctl daemon-reload
+
+    - name: Enable and start ttyd-container target
+      service:
+        name: ttyd-container.target
+        state: started
+        enabled: on
+
+    - name: Enable and start ttyd-admin
+      service:
+        name: ttyd-admin.service
+        state: started
+        enabled: on
+
+    - name: Trim unused host space
+      command: fstrim -av
+      become: true
+      changed_when: false
+
+  handlers:
+    - name: reload nginx
+      service:
+        name: nginx
+        state: reloaded
+
+    - name: systemctl daemon-reload
+      systemd:
+        daemon_reload: yes
+
+
+...

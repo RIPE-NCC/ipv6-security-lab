@@ -1,0 +1,30 @@
+---
+
+- name: Install tmux 2.3
+  hosts: default
+  become: true
+  tags: host
+  tasks:
+    - name: Install necessary packages
+      apt:
+        package:
+          - build-essential
+          - libevent-dev
+          - libncurses-dev
+
+    - name: Unpack tmux2.3 sources
+      tags: install
+      ansible.builtin.unarchive:
+        src: "https://github.com/tmux/tmux/releases/download/2.3/tmux-2.3.tar.gz"
+        dest: "/usr/src/"
+        remote_src: yes
+
+    - name: Compile tmux 2.3
+      tags: install
+      shell:
+        cmd: "./configure && make && make install"
+        chdir: "/usr/src/tmux-2.3/"
+        creates: "/usr/local/bin/tmux"
+
+
+...

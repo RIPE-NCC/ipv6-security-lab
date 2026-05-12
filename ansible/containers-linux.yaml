@@ -1,0 +1,184 @@
+---
+
+- name: Deploy containers
+  hosts: default
+  become: false
+  tags: container
+  handlers:
+    - name: reboot hostA
+      delegate_to: hostA
+      reboot:
+  tasks:
+    - name: Include variables
+      ansible.builtin.include_vars: vars/default.yaml
+
+    - name: Create first container
+      lxd_container:
+        url: "unix:/var/lib/incus/unix.socket"
+        name: hostA
+        state: started
+        config:
+          volatile.eth0.hwaddr: "00:16:3e:ee:00:0a"
+        source:
+          type: image
+          mode: pull
+          protocol: simplestreams
+          server: https://images.linuxcontainers.org
+          alias: ubuntu/noble
+        profiles: ["default"]
+        wait_for_ipv4_addresses: true
+
+    - name: Disable systemd-networkd IPv6 handling (workaround broken redirects)
+      delegate_to: hostA
+      lineinfile:
+        path: /etc/netplan/10-lxc.yaml
+        insertafter: "^      dhcp4: true"
+        line:         "      accept-ra: false"
+      notify: reboot hostA
+
+    - name: Enable kernel-level IPv6 autoconf (workaround broken redirects)
+      delegate_to: hostA
+      copy:
+        dest: /etc/sysctl.d/99-accept_ra.conf
+        content: "net.ipv6.conf.eth0.accept_ra = 1"
+      notify: reboot hostA
+
+    - name: Hack enable kernel-level IPv6 autoconf (workaround broken redirects)
+      delegate_to: hostA
+      copy:
+        dest: /etc/rc.local
+        mode: u=rwx,g=rx,o=rx
+        content: '#!/bin/sh
+
+          sysctl -w net.ipv6.conf.eth0.accept_ra=1
+
+          '
+      notify: reboot hostA
+
+    - meta: flush_handlers
+
+    - name: Install python3-apt
+      delegate_to: hostA
+      command:
+        cmd: apt-get -y install python3-apt
+        creates: /usr/lib/python3/dist-packages/apt/package.py
+
+    - name: Install necessary packages
+      delegate_to: hostA
+      package:
+        update_cache: true
+        name:
+          - python3-pip
+          - python3
+          - tcpdump
+          - wget
+          - libpcap-dev
+          - libssl-dev
+          - gcc
+          - python3-setuptools
+          - git
+          - make
+          - man
+          - nftables
+          - iptables
+          - nmap
+          - tshark
+          - nano
+          - joe
+          - vim
+
+    - name: Install python packages
+      delegate_to: hostA
+      pip:
+        break_system_packages: true
+        executable: pip3
+        state: latest
+        name:
+          - scapy[basic]
+          - cryptography
+          - netaddr
+
+    - name: Clone IPv6 toolkit repository
+      delegate_to: hostA
+      git:
+        repo: https://github.com/fgont/ipv6toolkit
+        dest: /usr/src/ipv6toolkit
+      register: clone_toolkit
+
+    - name: Compile the IPv6 toolkit
+      delegate_to: hostA
+      command:
+        cmd: make all
+        chdir: /usr/src/ipv6toolkit
+      when: clone_toolkit.changed
+      register: compile_toolkit
+
+    - name: Install the IPv6 toolkit
+      delegate_to: hostA
+      command:
+        cmd: make install
+        chdir: /usr/src/ipv6toolkit
+      when: compile_toolkit.changed
+
+    - name: Clone the THC-IPv6 repository
+      delegate_to: hostA
+      git:
+        repo: https://github.com/vanhauser-thc/thc-ipv6
+        dest: /usr/src/thc-ipv6
+      register: clone_thc
+
+    - name: Compile the THC-IPv6 toolkit
+      delegate_to: hostA
+      command:
+        cmd: make
+        chdir: /usr/src/thc-ipv6
+      when: clone_thc.changed
+      register: compile_thc
+
+    - name: Install the THC-IPv6 toolkit
+      delegate_to: hostA
+      command:
+        cmd: make install
+        chdir: /usr/src/thc-ipv6
+      when: compile_thc.changed
+
+    - name: Download Termshark x64
+      delegate_to: hostA
+      when: ansible_facts['architecture'] == "x86_64"
+      unarchive:
+        src: https://github.com/gcla/termshark/releases/download/v2.4.0/termshark_2.4.0_linux_x64.tar.gz
+        remote_src: yes
+        dest: /usr/local/bin/
+        extra_opts:
+          - --transform
+          - "s_^.*/__"
+
+    - name: Download Termshark arm64
+      delegate_to: hostA
+      when: ansible_facts['architecture'] == "aarch64"
+      unarchive:
+        src: https://github.com/gcla/termshark/releases/download/v2.4.0/termshark_2.4.0_linux_arm64.tar.gz
+        remote_src: yes
+        dest: /usr/local/bin/
+        extra_opts:
+          - --transform
+          - "s_^.*/__"
+
+    - name: Clone container
+      lxd_container:
+        url: "unix:/var/lib/incus/unix.socket"
+        name: "{{ item.name }}"
+        config:
+          volatile.eth0.hwaddr: "{{ item.mac }}"
+        state: started
+        source:
+          type: copy
+          source: hostA
+        profiles: ["default"]
+        wait_for_ipv4_addresses: true
+      with_items:
+        - name: hostB
+          mac: 00:16:3e:ee:00:0b
+        - name: hostC
+          mac: 00:16:3e:ee:00:0c
+...
